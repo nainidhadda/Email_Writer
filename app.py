@@ -3,7 +3,7 @@ import requests
 
 OPENROUTER_API_KEY = "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"
 
-st.title("OpenRouter Email Generator (Llama-3)")
+st.title("Naini's Email Generator")
 
 subject = st.text_input("Email Subject")
 context = st.text_area("Context/Details")
