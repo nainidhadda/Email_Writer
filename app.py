@@ -1,7 +1,7 @@
 import streamlit as st
-import openai
+import requests
 
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = "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"
 
 st.title("OpenRouter Email Generator (Llama-3)")
 
@@ -16,17 +16,22 @@ def generate_email(subject, context, tone):
         f"Context: {context}\n"
         f"Email:"
     )
-    client = openai.OpenAI(
-        api_key=OPENROUTER_API_KEY,
-        base_url="https://openrouter.ai/api/v1"
-    )
-    response = client.chat.completions.create(
-        model="meta-llama/llama-3-70b-instruct",
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=400,
-        temperature=0.7
-    )
-    return response.choices[0].message.content.strip()
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "model": "meta-llama/llama-3-70b-instruct",
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 400,
+        "temperature": 0.7
+    }
+    response = requests.post(url, headers=headers, json=data)
+    if response.status_code == 200:
+        return response.json()["choices"][0]["message"]["content"].strip()
+    else:
+        raise Exception(f"OpenRouter API error: {response.text}")
 
 if st.button("Generate Email"):
     if subject and context and tone:
